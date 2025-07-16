@@ -1,57 +1,33 @@
 import { useState } from "react";
-import { styles } from "../styles/AppStyles";
 
-// Import images
-import earlyGlaucoma2 from "../assets/classification_images/early_glaucoma_2.png";
-import advancedGlaucoma1 from "../assets/classification_images/advanced_glaucoma_1.png";
-import advancedGlaucoma from "../assets/classification_images/advanced_glaucoma.png";
-import normal from "../assets/classification_images/normal.png";
 import axios from "axios";
+import { BackButton } from "../components/BackButton";
+import { Footer } from "../components/Footer";
+import { CLASSIFIER_MODEL_INFO, SAMPLE_IMAGES } from "../constants";
+import { ModelInfo } from "../components/ModelInfo";
+import { ClassificationResultsPanel } from "../components/Classifier/ClassificationResultsPanel";
+import { SelectImagePanel } from "../components/Classifier/SelectImagePanel";
 
-function Classifier({ onBack, shouldGoToMainPage }) {
+const Classifier = ({ onBack, shouldGoToMainPage }) => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [isClassifying, setIsClassifying] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
   const [results, setResults] = useState(null);
 
-  const sampleImages = [
-    {
-      id: 0,
-      label: "Early Glaucoma",
-      filename: earlyGlaucoma2,
-    },
-    {
-      id: 1,
-      label: "Advanced Glaucoma",
-      filename: advancedGlaucoma1,
-    },
-    {
-      id: 2,
-      label: "Advanced Glaucoma",
-      filename: advancedGlaucoma,
-    },
-    {
-      id: 3,
-      label: "Healthy",
-      filename: normal,
-    },
-  ];
-
   const handleClassify = async () => {
     setIsClassifying(true);
+    setErrorMessage(null);
+    setResults(null);
 
     try {
-      const selectedImageData = sampleImages[selectedImage];
+      const selectedImageData = SAMPLE_IMAGES[selectedImage];
 
-      // Convert the imported image to a blob
       const response = await fetch(selectedImageData.filename);
       const blob = await response.blob();
 
-      // Create FormData and append the image file
       const formData = new FormData();
       formData.append("image", blob, `image_${selectedImage}.png`);
 
-      // Send the image file to the backend for classification
       const classificationResponse = await axios.post(
         "http://localhost:8080/classify",
         formData,
@@ -65,189 +41,69 @@ function Classifier({ onBack, shouldGoToMainPage }) {
       setResults(classificationResponse.data);
     } catch (error) {
       console.error("Classification error:", error);
-      // You might want to show an error message to the user here
-      setErrorMessage(error.message);
+      setErrorMessage(
+        error.response?.data?.error || error.message || "Classification failed"
+      );
     } finally {
       setIsClassifying(false);
     }
   };
 
-  const getConfidenceClass = (confidence) => {
-    if (confidence > 80) return "high";
-    if (confidence > 30) return "medium";
-    return "low";
-  };
-
   return (
     <div className={styles.container}>
       <div className={styles.mainCard}>
-        {/* Back Button */}
-        {shouldGoToMainPage ? (
-          <button
-            onClick={onBack}
-            className="mb-6 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition-colors duration-200 flex items-center"
-          >
-            <span className="mr-2">←</span>
-            Back to Main
-          </button>
-        ) : null}
+        <BackButton onBack={onBack} shouldGoToMainPage={shouldGoToMainPage} />
 
-        {/* Header */}
         <div className={styles.headerSection}>
-          <h1 className={styles.title}>Glaucoma Classification Demo</h1>
+          <h1 className={styles.title}>{CLASSIFIER_MODEL_INFO.name}</h1>
           <p className={styles.subtitle}>
             Select a sample image and get instant disease classification with
-            confidence scores
+            confidence scores.
           </p>
         </div>
 
-        {/* Model Info */}
-        <div className={styles.modelInfoSection}>
-          <h2 className={styles.modelInfoTitle}>
-            <span className={styles.modelInfoIcon}>🔬</span>
-            Model Information
-          </h2>
-          <p className={styles.modelInfoText}>
-            This demo showcases a deep learning model trained on retinal imaging
-            data to classify glaucoma disease progression. The model uses a
-            ResNet-8 architecture fine-tuned on a Harvard-Glaucoma dataset.
-            Accuracy: 94.2% on test set.
-          </p>
-          <div className={styles.modelInfoButtonsContainer}>
-            <button className={styles.modelInfoButton}>
-              <span className={styles.modelInfoButtonIcon}>📄</span>
-              See the Paper
-            </button>
-            <button className={styles.modelInfoButton}>
-              <span className={styles.modelInfoButtonIcon}>💻</span>
-              GitHub Code
-            </button>
-          </div>
-        </div>
+        <ModelInfo
+          modelInfo={CLASSIFIER_MODEL_INFO.description}
+          githubLink={CLASSIFIER_MODEL_INFO.github}
+          paperLink={CLASSIFIER_MODEL_INFO.paper}
+          icon="🔬"
+        />
 
-        {/* Main Demo Section */}
         <div className={styles.demoGrid}>
-          {/* Image Selection */}
-          <div className={styles.imageSelectionCard}>
-            <h3 className={styles.sectionTitle}>
-              <span className={styles.sectionIcon}>📸</span>
-              Select an Image for Classification
-            </h3>
+          <SelectImagePanel
+            handleClassify={handleClassify}
+            isClassifying={isClassifying}
+            selectedImage={selectedImage}
+            setSelectedImage={setSelectedImage}
+          />
 
-            <div className={styles.imageGrid}>
-              {sampleImages.map((image) => (
-                <div
-                  key={image.id}
-                  className={`${styles.imageCard.base} ${
-                    selectedImage === image.id
-                      ? styles.imageCard.selected
-                      : styles.imageCard.unselected
-                  }`}
-                  onClick={() => setSelectedImage(image.id)}
-                >
-                  <img
-                    src={image.filename}
-                    alt={image.label}
-                    className={styles.imageDisplay}
-                  />
-                  <div
-                    className={styles.imagePlaceholder}
-                    style={{ display: "none" }}
-                  >
-                    Sample Image {image.id + 1}
-                  </div>
-                  <div className={styles.imageLabel}>{image.label}</div>
-                </div>
-              ))}
-            </div>
-
-            <button
-              onClick={handleClassify}
-              disabled={isClassifying}
-              className={`${styles.classifyButton.base} ${styles.classifyButton.disabled}`}
-            >
-              {isClassifying ? (
-                <span className={styles.buttonContent}>
-                  <div className={styles.spinner}></div>
-                  Classifying...
-                </span>
-              ) : (
-                <span className={styles.buttonContent}>
-                  Classify Selected Image
-                </span>
-              )}
-            </button>
-          </div>
-
-          {/* Results Panel */}
-          <div className={styles.resultsCard}>
-            <h3 className={styles.sectionTitle}>
-              <span className={styles.sectionIcon}>📊</span>
-              Classification Results
-            </h3>
-
-            {!results ? (
-              <div className={styles.emptyResults}>
-                {errorMessage ? (
-                  <div className={styles.errorMessage}>{errorMessage}</div>
-                ) : (
-                  <div>
-                    {" "}
-                    Select an image and click "Classify" to see prediction
-                    results{" "}
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className={styles.resultsContainer}>
-                {results.map((result, index) => (
-                  <div
-                    key={index}
-                    className={`${styles.resultItem.base} ${
-                      result.is_top_prediction
-                        ? styles.resultItem.top
-                        : styles.resultItem.regular
-                    }`}
-                  >
-                    <span className={styles.resultDisease}>
-                      {result.class_name}
-                    </span>
-                    <span
-                      className={`${styles.confidenceBadge.base} ${
-                        result.isTop
-                          ? styles.confidenceBadge.top
-                          : getConfidenceClass(result.confidence) === "high"
-                          ? styles.confidenceBadge.high
-                          : getConfidenceClass(result.confidence) === "medium"
-                          ? styles.confidenceBadge.medium
-                          : styles.confidenceBadge.low
-                      }`}
-                    >
-                      {result.confidence}%
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <ClassificationResultsPanel
+            results={results}
+            errorMessage={errorMessage}
+            isClassifying={isClassifying}
+          />
         </div>
 
-        {/* Footer */}
-        <div className={styles.footer}>
-          <p>
-            Aleksandra Kulbaka • made with{" "}
-            <a
-              href="https://github.com/aca18awk/ml_demo_web_app"
-              target="_blank"
-            >
-              ML demo web app
-            </a>{" "}
-            template
-          </p>
-        </div>
+        <Footer />
       </div>
     </div>
   );
-}
+};
 
 export default Classifier;
+
+const styles = {
+  // Main container styles
+  container: "min-h-screen bg-gradient-to-br from-indigo-500 to-purple-600 p-5",
+  mainCard:
+    "max-w-6xl mx-auto bg-white/95 backdrop-blur-sm rounded-3xl p-10 shadow-2xl",
+
+  // Header styles
+  headerSection: "text-center mb-10",
+  title:
+    "text-4xl font-bold text-gray-800 mb-3 bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-text text-transparent",
+  subtitle: "text-xl text-gray-600 leading-relaxed",
+
+  // Main demo section styles
+  demoGrid: "grid grid-cols-1 lg:grid-cols-2 gap-10 mb-10",
+};
