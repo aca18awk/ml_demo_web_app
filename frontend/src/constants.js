@@ -1,0 +1,2 @@
+// options: "CLASSIFIER", "DIFFUSION", "MULTIMODAL"
+export const MODEL_TYPE = "CLASSIFIER";
