@@ -59,7 +59,7 @@ def classify_image(model, image_path, device, image_size):
     return probs
 
 
-def get_prediction(model_path=MODEL_PATH, image_size=IMAGE_SIZE, classes_names=CLASS_NAMES, input_file=INPUT_FILE):
+def get_prediction(input_file, model_path=MODEL_PATH, image_size=IMAGE_SIZE, classes_names=CLASS_NAMES):
     num_classes = len(classes_names)
 
     model = RetinalClassifier(
@@ -79,4 +79,4 @@ def get_prediction(model_path=MODEL_PATH, image_size=IMAGE_SIZE, classes_names=C
 
 
 if __name__ == "__main__":
-    get_prediction()
+    get_prediction(input_file=INPUT_FILE)

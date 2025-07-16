@@ -11,6 +11,7 @@ import axios from "axios";
 function Classifier({ onBack, shouldGoToMainPage }) {
   const [selectedImage, setSelectedImage] = useState(0);
   const [isClassifying, setIsClassifying] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
   const [results, setResults] = useState(null);
 
   const sampleImages = [
@@ -39,10 +40,36 @@ function Classifier({ onBack, shouldGoToMainPage }) {
   const handleClassify = async () => {
     setIsClassifying(true);
 
-    const response = await axios.get("http://localhost:8080/classify");
+    try {
+      const selectedImageData = sampleImages[selectedImage];
 
-    setResults(response.data);
-    setIsClassifying(false);
+      // Convert the imported image to a blob
+      const response = await fetch(selectedImageData.filename);
+      const blob = await response.blob();
+
+      // Create FormData and append the image file
+      const formData = new FormData();
+      formData.append("image", blob, `image_${selectedImage}.png`);
+
+      // Send the image file to the backend for classification
+      const classificationResponse = await axios.post(
+        "http://localhost:8080/classify",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      setResults(classificationResponse.data);
+    } catch (error) {
+      console.error("Classification error:", error);
+      // You might want to show an error message to the user here
+      setErrorMessage(error.message);
+    } finally {
+      setIsClassifying(false);
+    }
   };
 
   const getConfidenceClass = (confidence) => {
@@ -161,7 +188,15 @@ function Classifier({ onBack, shouldGoToMainPage }) {
 
             {!results ? (
               <div className={styles.emptyResults}>
-                Select an image and click "Classify" to see prediction results
+                {errorMessage ? (
+                  <div className={styles.errorMessage}>{errorMessage}</div>
+                ) : (
+                  <div>
+                    {" "}
+                    Select an image and click "Classify" to see prediction
+                    results{" "}
+                  </div>
+                )}
               </div>
             ) : (
               <div className={styles.resultsContainer}>
