@@ -1,21 +1,17 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
+from classifier.classifier import get_prediction
 
 app = Flask(__name__)
 # double-check
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
 
-@app.route("/api/users", methods=["GET"])
-def users():
-    return jsonify(
-        {
-            "users": [
-                {"id": 1, "name": "John Doe", "email": "john.doe@example.com"},
-                {"id": 2, "name": "Jane Smith", "email": "jane.smith@example.com"},
-            ]
-        }
-    )
+@app.route("/classify", methods=["GET"])
+def classify():
+
+    results = get_prediction()
+    return jsonify(results)
 
 
 if __name__ == "__main__":
