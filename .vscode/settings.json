@@ -1,7 +1,9 @@
 {
-    "workbench.colorCustomizations": {
-        "activityBar.background": "#0A3507",
-        "titleBar.activeBackground": "#0E4B09",
-        "titleBar.activeForeground": "#F2FDF1"
-    }
+  "workbench.colorCustomizations": {
+    "activityBar.background": "#0A3507",
+    "titleBar.activeBackground": "#0E4B09",
+    "titleBar.activeForeground": "#F2FDF1"
+  },
+  "eslint.workingDirectories": ["frontend"],
+  "eslint.validate": ["javascript", "javascriptreact"]
 }

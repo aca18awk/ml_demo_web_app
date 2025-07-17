@@ -1,82 +1,49 @@
 """
-Use a trained classifier to classify retinal images.
+Train a standard classifier on clean retinal images.
 """
-import torch as th
-from PIL import Image
-import torchvision.transforms as transforms
-
-from classifier.RetinalClassifier import RetinalClassifier
+import torch.nn as nn
+import torch.nn.functional as F
 
 
-MODEL_PATH = "/Users/aleksandrakulbaka/Desktop/phd_code/ML_demo_web_app/backend/classifier/best_acc_model.pt"
-CLASS_NAMES = ["Healthy", "Early Glaucoma", "Advanced Glaucoma"]
-IMAGE_SIZE = 64
+class Classifier(nn.Module):
+    def __init__(self, image_size=64, num_classes=3):
+        super().__init__()
 
-INPUT_FILE = "/Users/aleksandrakulbaka/Desktop/phd_code/ML_demo_web_app/backend/classifier/advanced_glaucoma_1.png"
+        self.conv1 = nn.Conv2d(3, 32, kernel_size=3, padding=1)
+        self.bn1 = nn.BatchNorm2d(32)
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
+        self.bn2 = nn.BatchNorm2d(64)
+        self.conv3 = nn.Conv2d(64, 128, kernel_size=3, padding=1)
+        self.bn3 = nn.BatchNorm2d(128)
+        self.conv4 = nn.Conv2d(128, 256, kernel_size=3, padding=1)
+        self.bn4 = nn.BatchNorm2d(256)
 
+        self.pool = nn.MaxPool2d(2)
+        self.dropout = nn.Dropout(0.3)
 
-def dev():
-    """
-    Get the device to use for torch.distributed.
-    """
-    if th.cuda.is_available():
-        return th.device(f"cuda")
-    return th.device("cpu")
+        fc_size = 256 * (image_size // 16) * (image_size // 16)
 
+        self.fc1 = nn.Linear(fc_size, 512)
+        self.fc2 = nn.Linear(512, num_classes)
 
-def format_results(probabilities, classes_names):
-    max_confidence = max(probabilities)
-    formatted_results = []
-    for i, prob in enumerate(probabilities):
-        formatted_results.append({
-            "class_name": classes_names[i],
-            "confidence": round(float(prob * 100), 2),
-            "is_top_prediction": bool(prob == max_confidence)
-        })
+    def forward(self, x):
+        x = F.relu(self.bn1(self.conv1(x)))
+        x = self.pool(x)
 
-    return formatted_results
+        x = F.relu(self.bn2(self.conv2(x)))
+        x = self.pool(x)
 
+        x = F.relu(self.bn3(self.conv3(x)))
+        x = self.pool(x)
 
-def classify_image(model, image_path, device, image_size):
-    """Classify an image using the trained model."""
+        x = F.relu(self.bn4(self.conv4(x)))
+        x = self.pool(x)
 
-    transform = transforms.Compose([
-        transforms.Resize((image_size, image_size)),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
-    ])
+        x = x.view(x.size(0), -1)
+        x = self.dropout(x)
 
-    image = Image.open(image_path).convert("RGB")
-    image_tensor = transform(image)
-    if not isinstance(image_tensor, th.Tensor):
-        image_tensor = transforms.ToTensor()(image_tensor)
-    image_tensor = image_tensor.unsqueeze(0).to(device)
+        x = F.relu(self.fc1(x))
+        x = self.dropout(x)
 
-    with th.no_grad():
-        logits = model(image_tensor)
-        probs = th.softmax(logits, dim=1).cpu().numpy()[0]
-
-    return probs
-
-
-def get_prediction(input_file, model_path=MODEL_PATH, image_size=IMAGE_SIZE, classes_names=CLASS_NAMES):
-    num_classes = len(classes_names)
-
-    model = RetinalClassifier(
-        image_size=image_size, num_classes=num_classes)
-    model.load_state_dict(th.load(model_path, map_location="cpu"))
-    model.to(dev())
-    model.eval()
-
-    print(f"Classifying image {input_file}...")
-    probs = classify_image(
-        model, input_file, dev(), image_size
-    )
-
-    formatted_results = format_results(probs, classes_names)
-
-    return formatted_results
-
-
-if __name__ == "__main__":
-    get_prediction(input_file=INPUT_FILE)
+        x = self.fc2(x)
+        return x

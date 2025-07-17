@@ -16,19 +16,18 @@ A machine learning demo web application featuring retinal image classification w
 ```
 ML_demo_web_app/
 ├── backend/
-│   ├── main.py                    # Flask application entry point
-│   ├── classifier/
-│   │   ├── classifier.py          # Classification logic
-│   │   ├── RetinalClassifier.py   # PyTorch model definition
-│   │   └── best_acc_model.pt      # Trained model weights
+│   ├── main.py                    # Flask application entry point with API endpoints
+│   ├── classifier/                # Classification logic
+│   │   ├── ...
+│   │   └── get_prediction.py      # Main prediction function with typing and documentation
 │   └── backend_env/               # Python virtual environment
 ├── frontend/
 │   ├── src/
-│   │   ├── App.jsx               # Main React component
 │   │   ├── constants.js          # Configuration constants
+│   │   ├── App.jsx               # Main React component
 │   │   ├── screens/              # Main application screens
 │   │   ├── components/           # Reusable UI components
-│   │   └── assets/               # Static assets (sample images)
+│   │   └── assets/               # Static assets (inc. sample images)
 │   ├── package.json              # Node.js dependencies
 │   └── vite.config.js            # Vite configuration
 └── README.md

@@ -1,11 +1,11 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from classifier.classifier import get_prediction
+from classifier.get_prediction import get_prediction
 import os
 import tempfile
 
 app = Flask(__name__)
-# double-check
+
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
 
