@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "./App.css";
-import MainPage from "./screens/MainPage";
+import ChooseModel from "./screens/ChooseModel";
 import Classifier from "./screens/Classifier";
 import Diffusion from "./screens/Diffusion";
 import { MODEL_TYPE } from "./constants";
@@ -36,7 +36,7 @@ function App() {
           />
         );
       default:
-        return <MainPage onNavigate={handleNavigation} />;
+        return <ChooseModel onNavigate={handleNavigation} />;
     }
   };
 

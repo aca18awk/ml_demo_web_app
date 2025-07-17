@@ -1,6 +1,6 @@
 import { Footer } from "../components/Footer";
 
-function MainPage({ onNavigate }) {
+const ChooseModel = ({ onNavigate }) => {
   return (
     <div className={mainPageStyles.container}>
       <div className={mainPageStyles.mainCard}>
@@ -8,8 +8,7 @@ function MainPage({ onNavigate }) {
         <div className={mainPageStyles.headerSection}>
           <h1 className={mainPageStyles.title}>AI Medical Demo Platform</h1>
           <p className={mainPageStyles.subtitle}>
-            Choose from our AI-powered medical tools for image analysis and
-            generation
+            Explore demos for medical image analysis and generation
           </p>
         </div>
 
@@ -22,12 +21,9 @@ function MainPage({ onNavigate }) {
             <div className={mainPageStyles.buttonContent}>
               <span className={mainPageStyles.buttonIcon}>🔬</span>
               <div className={mainPageStyles.buttonText}>
-                <h3 className={mainPageStyles.buttonTitle}>
-                  Disease Classifier
-                </h3>
+                <h3 className={mainPageStyles.buttonTitle}>Classifier Demo</h3>
                 <p className={mainPageStyles.buttonDescription}>
-                  Upload medical images and get AI-powered disease
-                  classification with confidence scores
+                  Classify images for disease detection
                 </p>
               </div>
             </div>
@@ -41,11 +37,10 @@ function MainPage({ onNavigate }) {
               <span className={mainPageStyles.buttonIcon}>🎨</span>
               <div className={mainPageStyles.buttonText}>
                 <h3 className={mainPageStyles.buttonTitle}>
-                  Medical Diffusion
+                  Medical Diffusion Demo
                 </h3>
                 <p className={mainPageStyles.buttonDescription}>
-                  Generate synthetic medical images using advanced diffusion
-                  models
+                  Generate synthetic medical images
                 </p>
               </div>
             </div>
@@ -56,9 +51,9 @@ function MainPage({ onNavigate }) {
       </div>
     </div>
   );
-}
+};
 
-export default MainPage;
+export default ChooseModel;
 
 const mainPageStyles = {
   // Main container styles
