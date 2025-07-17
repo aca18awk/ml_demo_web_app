@@ -8,64 +8,52 @@ export const SelectImagePanel = ({
 }) => {
   return (
     <>
-      <div className={styles.imageSelectionCard}>
-        <h3 className={styles.sectionTitle}>
-          <span className={styles.sectionIcon}>📸</span>
-          Select an Image for Classification
-        </h3>
-
-        <div className={styles.imageGrid}>
-          {SAMPLE_IMAGES.map((image) => (
+      <div className={styles.imageGrid}>
+        {SAMPLE_IMAGES.map((image) => (
+          <div
+            key={image.id}
+            className={`${styles.imageCard.base} ${
+              selectedImage === image.id
+                ? styles.imageCard.selected
+                : styles.imageCard.unselected
+            }`}
+            onClick={() => setSelectedImage(image.id)}
+          >
+            <img
+              src={image.filename}
+              alt={image.label}
+              className={styles.imageDisplay}
+            />
             <div
-              key={image.id}
-              className={`${styles.imageCard.base} ${
-                selectedImage === image.id
-                  ? styles.imageCard.selected
-                  : styles.imageCard.unselected
-              }`}
-              onClick={() => setSelectedImage(image.id)}
+              className={styles.imagePlaceholder}
+              style={{ display: "none" }}
             >
-              <img
-                src={image.filename}
-                alt={image.label}
-                className={styles.imageDisplay}
-              />
-              <div
-                className={styles.imagePlaceholder}
-                style={{ display: "none" }}
-              >
-                Sample Image {image.id + 1}
-              </div>
-              <div className={styles.imageLabel}>{image.label}</div>
+              Sample Image {image.id + 1}
             </div>
-          ))}
-        </div>
-
-        <button
-          onClick={handleClassify}
-          disabled={isClassifying}
-          className={`${styles.classifyButton.base} ${styles.classifyButton.disabled}`}
-        >
-          {isClassifying ? (
-            <span className={styles.buttonContent}>
-              <div className={styles.spinner}></div>
-              Classifying...
-            </span>
-          ) : (
-            <span className={styles.buttonContent}>
-              Classify Selected Image
-            </span>
-          )}
-        </button>
+            <div className={styles.imageLabel}>{image.label}</div>
+          </div>
+        ))}
       </div>
+
+      <button
+        onClick={handleClassify}
+        disabled={isClassifying}
+        className={`${styles.classifyButton.base} ${styles.classifyButton.disabled}`}
+      >
+        {isClassifying ? (
+          <span className={styles.buttonContent}>
+            <div className={styles.spinner}></div>
+            Classifying...
+          </span>
+        ) : (
+          <span className={styles.buttonContent}>Classify Selected Image</span>
+        )}
+      </button>
     </>
   );
 };
 
 const styles = {
-  imageSelectionCard: "bg-white rounded-2xl p-8 shadow-lg",
-  sectionTitle: "text-xl font-semibold text-gray-800 mb-6 flex items-center",
-  sectionIcon: "mr-3",
   imageGrid: "grid grid-cols-2 gap-4 mb-6",
   imageCard: {
     base: "border-2 rounded-xl p-3 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-md",

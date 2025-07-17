@@ -3,16 +3,36 @@ import { useState } from "react";
 import axios from "axios";
 import { BackButton } from "../components/BackButton";
 import { Footer } from "../components/Footer";
-import { CLASSIFIER_MODEL_INFO, SAMPLE_IMAGES } from "../constants";
+import {
+  CLASSIFIER_MODEL_INFO,
+  SAMPLE_IMAGES,
+  CAN_USER_UPLOAD_IMAGE,
+} from "../constants";
 import { ModelInfo } from "../components/ModelInfo";
 import { ClassificationResultsPanel } from "../components/Classifier/ClassificationResultsPanel";
 import { SelectImagePanel } from "../components/Classifier/SelectImagePanel";
+import { UploadImagePanel } from "../components/Classifier/UploadImagePanel";
+import { ImageSelectionToggle } from "../components/Classifier/ImageSelectionToggle";
 
 const Classifier = ({ onBack, shouldGoToMainPage }) => {
   const [selectedImage, setSelectedImage] = useState(0);
+  const [uploadedImage, setUploadedImage] = useState(null);
+  const [useUpload, setUseUpload] = useState(false);
   const [isClassifying, setIsClassifying] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
   const [results, setResults] = useState(null);
+
+  const handleToggleChange = () => {
+    if (useUpload) {
+      setUploadedImage(null);
+    } else {
+      setSelectedImage(0);
+    }
+
+    setUseUpload(!useUpload);
+    setResults(null);
+    setErrorMessage(null);
+  };
 
   const handleClassify = async () => {
     setIsClassifying(true);
@@ -20,13 +40,23 @@ const Classifier = ({ onBack, shouldGoToMainPage }) => {
     setResults(null);
 
     try {
-      const selectedImageData = SAMPLE_IMAGES[selectedImage];
+      let blob;
+      let filename;
 
-      const response = await fetch(selectedImageData.filename);
-      const blob = await response.blob();
+      if (CAN_USER_UPLOAD_IMAGE && useUpload && uploadedImage) {
+        // Use uploaded image
+        blob = uploadedImage;
+        filename = uploadedImage.name || "uploaded_image.png";
+      } else {
+        // Use sample image
+        const selectedImageData = SAMPLE_IMAGES[selectedImage];
+        const response = await fetch(selectedImageData.filename);
+        blob = await response.blob();
+        filename = `image_${selectedImage}.png`;
+      }
 
       const formData = new FormData();
-      formData.append("image", blob, `image_${selectedImage}.png`);
+      formData.append("image", blob, filename);
 
       const classificationResponse = await axios.post(
         "http://localhost:8080/classify",
@@ -70,12 +100,33 @@ const Classifier = ({ onBack, shouldGoToMainPage }) => {
         />
 
         <div className={styles.demoGrid}>
-          <SelectImagePanel
-            handleClassify={handleClassify}
-            isClassifying={isClassifying}
-            selectedImage={selectedImage}
-            setSelectedImage={setSelectedImage}
-          />
+          <div className={styles.imageSelectionCard}>
+            <h3 className={styles.sectionTitle}>
+              <span className={styles.sectionIcon}>📸</span>
+              Select an Image for Classification
+            </h3>
+
+            <ImageSelectionToggle
+              handleToggleChange={handleToggleChange}
+              useUpload={useUpload}
+            />
+
+            {CAN_USER_UPLOAD_IMAGE && useUpload ? (
+              <UploadImagePanel
+                handleClassify={handleClassify}
+                isClassifying={isClassifying}
+                uploadedImage={uploadedImage}
+                setUploadedImage={setUploadedImage}
+              />
+            ) : (
+              <SelectImagePanel
+                handleClassify={handleClassify}
+                isClassifying={isClassifying}
+                selectedImage={selectedImage}
+                setSelectedImage={setSelectedImage}
+              />
+            )}
+          </div>
 
           <ClassificationResultsPanel
             results={results}
@@ -106,4 +157,9 @@ const styles = {
 
   // Main demo section styles
   demoGrid: "grid grid-cols-1 lg:grid-cols-2 gap-10 mb-10",
+
+  // Image selection card styles
+  imageSelectionCard: "bg-white rounded-2xl p-8 shadow-lg",
+  sectionTitle: "text-xl font-semibold text-gray-800 mb-6 flex items-center",
+  sectionIcon: "mr-3",
 };
