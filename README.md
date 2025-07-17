@@ -1,122 +1,119 @@
-# Flask + React Demo Web App
+# ML Demo Web App
 
-A minimal full-stack web application with Flask backend and React frontend.
+A machine learning demo web application featuring retinal image classification with Flask backend and React frontend.
+
+**Tutorial reference**: https://youtu.be/ctQMqqEo4G8?si=9RymLsDTRMrStxL5
 
 ## Features
 
-- **Backend (Flask)**:
-
-tutorial used: https://youtu.be/ctQMqqEo4G8?si=9RymLsDTRMrStxL5
-
-To create virtual env I used:
-
-```bash
-python -m venv backend_env
-source backend_env/bin/activate
-```
-
-selecting correct venv: https://github.com/astral-sh/uv/issues/9637
-
-- **Frontend (React + Vite)**:
-  - Runs on port 5173
-  - To install I did:
-  ```bash
-  npx create-vite
-  cd frontend
-  npm install
-  npm run dev
-  ```
-  I had to update the node version to the latest (nvm install node) - make sure it's the latest version
-
-`npm install axios`
+- **Retinal Image Classifier**: Deep learning model for glaucoma disease progression classification
+- **Interactive UI**: React frontend with sample images and optional user upload functionality
+- **Real-time Classification**: Instant predictions with confidence scores
+- **Responsive Design**: Modern UI built with Tailwind CSS
 
 ## Project Structure
 
 ```
 ML_demo_web_app/
 ├── backend/
-│   ├── app.py              # Flask application
-│   └── requirements.txt    # Python dependencies
+│   ├── main.py                    # Flask application entry point
+│   ├── classifier/
+│   │   ├── classifier.py          # Classification logic
+│   │   ├── RetinalClassifier.py   # PyTorch model definition
+│   │   └── best_acc_model.pt      # Trained model weights
+│   └── backend_env/               # Python virtual environment
 ├── frontend/
 │   ├── src/
-│   │   ├── App.jsx        # Main React component
-│   │   └── App.css        # Styles
-│   ├── package.json       # Node.js dependencies
-│   └── ...                # Other Vite files
+│   │   ├── App.jsx               # Main React component
+│   │   ├── constants.js          # Configuration constants
+│   │   ├── screens/              # Main application screens
+│   │   ├── components/           # Reusable UI components
+│   │   └── assets/               # Static assets (sample images)
+│   ├── package.json              # Node.js dependencies
+│   └── vite.config.js            # Vite configuration
 └── README.md
 ```
 
-## Setup Instructions
+## Installation & Setup
 
-### Backend (Flask)
+### Prerequisites
 
-1. Navigate to the backend directory:
+- Python 3.8+
+- Node.js 18+ (use `nvm install node` for latest version)
+- PyTorch and torchvision
+
+### Backend Setup
+
+1. Navigate to backend directory:
 
    ```bash
    cd backend
    ```
 
-2. Create a virtual environment (recommended):
+2. Create and activate virtual environment:
 
    ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   python -m venv backend_env
+   source backend_env/bin/activate  # On Windows: backend_env\Scripts\activate
    ```
 
-3. Install dependencies:
+3. Install Python dependencies:
 
    ```bash
-   pip install -r requirements.txt
+   pip install flask flask-cors torch torchvision pillow
    ```
 
-4. Run the Flask server:
+4. Start the Flask server:
    ```bash
-   python app.py
+   python main.py
    ```
+   Backend runs on `http://localhost:8080`
 
-The backend will be available at `http://localhost:5000`
+### Frontend Setup
 
-### Frontend (React)
-
-1. Navigate to the frontend directory:
+1. Navigate to frontend directory:
 
    ```bash
    cd frontend
    ```
 
-2. Install dependencies (already done):
+2. Install dependencies:
 
    ```bash
    npm install
    ```
 
-3. Start the development server:
+3. Start development server:
    ```bash
    npm run dev
    ```
-
-The frontend will be available at `http://localhost:5173`
-
-## API Endpoints
-
-- `GET /` - Welcome message
-- `GET /api/users` - Get all users
-- `POST /api/users` - Create a new user
-- `GET /api/users/<id>` - Get user by ID
+   Frontend runs on `http://localhost:5173`
 
 ## Usage
 
-1. Start both the Flask backend and React frontend
-2. Open your browser to `http://localhost:5173`
-3. View the list of users
-4. Add new users using the form
-5. The data persists only while the Flask server is running
+1. Start both backend and frontend servers (see setup instructions above)
+2. Open browser to `http://localhost:5173`
+3. Select from sample retinal images or upload your own (PNG/JPG)
+4. Click "Classify" to get instant predictions with confidence scores
+5. View results showing disease classification (Healthy, Early Glaucoma, Advanced Glaucoma)
 
-## Next Steps
+## Configuration
 
-- Add a database (SQLite, PostgreSQL, etc.)
-- Add user authentication
-- Add more CRUD operations (Update, Delete)
-- Add form validation
-- Add error handling
-- Deploy to production
+### Key Settings (`frontend/src/constants.js`)
+
+- `MODEL_TYPE`: Set to `"CLASSIFIER"` for single model or `"MULTIMODAL"` for model selection
+- `CAN_USER_UPLOAD_IMAGE`: Enable/disable user image upload functionality
+
+### Customization
+
+- **Sample Images**: Add images to `frontend/src/assets/classification_images/`
+- **Model**: Replace `backend/classifier/best_acc_model.pt` with your trained model
+- **Classes**: Update `CLASS_NAMES` in `backend/classifier/classifier.py`
+
+## API Endpoints
+
+- `POST /classify` - Upload image for classification (multipart/form-data)
+
+## Future Extensions
+
+- **Diffusion Model**: Framework ready for adding generative models
