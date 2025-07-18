@@ -9,6 +9,26 @@ A blueprint machine learning demo application with Flask backend and React front
 - **Real-time Predictions**: Instant classification with confidence scores
 - **Blueprint Architecture**: Easy to adapt for your own ML models
 
+## Project Structure
+
+```
+ML_demo_web_app/
+├── backend/
+│   ├── main.py                    # Flask API endpoints
+│   ├── classifier/
+│   │   ├── get_prediction.py      # Main prediction function
+│   │   └── ...                    # Model architecture and utilities
+│   |
+├── frontend/
+│   ├── src/
+│   │   ├── constants.js           # Configuration constants
+│   │   ├── App.jsx                # Main React component
+│   │   ├── components/            # Reusable UI components
+│   │   └── assets/                # Sample images and static assets
+│   └── package.json
+└── README.md
+```
+
 ## Quick Start
 
 ### Clone the Repository
@@ -100,29 +120,11 @@ def get_prediction(input_file: str, model_path: str = MODEL_PATH,
 - **Sample Images**: Add to `frontend/src/assets/classification_images/`
 - **Model Weights**: Replace `backend/classifier/best_acc_model.pt`
 
-## Project Structure
-
-```
-ML_demo_web_app/
-├── backend/
-│   ├── main.py                    # Flask API endpoints
-│   ├── classifier/
-│   │   ├── get_prediction.py      # Main prediction function
-│   │   └── ...                    # Model architecture and utilities
-│   |
-├── frontend/
-│   ├── src/
-│   │   ├── constants.js           # Configuration constants
-│   │   ├── App.jsx                # Main React component
-│   │   ├── components/            # Reusable UI components
-│   │   └── assets/                # Sample images and static assets
-│   └── package.json
-└── README.md
-```
-
 ## API
 
 - `POST /classify` - Upload image for classification (multipart/form-data)
+
+## Deploying the application
 
 ## Requirements
 
