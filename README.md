@@ -234,6 +234,16 @@ npm run build
 firebase deploy
 ```
 
+## References
+
+The retinal images used in this demo are from the Harvard Dataverse:
+
+**"Glaucoma detection from retinal images"**
+Harvard Dataverse, V1
+DOI: [10.7910/DVN/1YRRAC](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/1YRRAC)
+
+This dataset contains retinal fundus images labeled for glaucoma classification, which were used to train and validate the deep learning model featured in this demo.
+
 ## Requirements
 
 - Python 3.8+
