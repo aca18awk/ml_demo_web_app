@@ -4,10 +4,13 @@ import advancedGlaucoma from "./assets/classification_images/advanced_glaucoma.p
 import normal from "./assets/classification_images/normal.png";
 
 // options: "CLASSIFIER", "DIFFUSION", "MULTIMODAL"
-export const MODEL_TYPE = "CLASSIFIER";
+export const MODEL_TYPE = "MULTIMODAL";
+
+// API Configuration
+export const API_BASE_URL = "";
 
 // CLASSIFIER INFO
-export const CAN_USER_UPLOAD_IMAGE = false;
+export const CAN_USER_UPLOAD_IMAGE = true;
 
 export const CLASSIFIER_MODEL_INFO = {
   name: "Retinal Image Classifier",

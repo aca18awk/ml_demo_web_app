@@ -15,17 +15,21 @@ A blueprint machine learning demo application with Flask backend and React front
 ML_demo_web_app/
 ├── backend/
 │   ├── main.py                    # Flask API endpoints
-│   ├── classifier/
-│   │   ├── get_prediction.py      # Main prediction function
-│   │   └── ...                    # Model architecture and utilities
-│   |
+│   ├── Dockerfile                 # Docker configuration for deployment
+│   ├── requirements.txt           # Python dependencies
+│   ├── test_endpoints.py          # API testing script
+│   └── classifier/
+│       ├── get_prediction.py      # Main prediction function
+│       ├── best_acc_model.pt      # Trained model weights
+│       └── ...                    # Model architecture and utilities
 ├── frontend/
 │   ├── src/
-│   │   ├── constants.js           # Configuration constants
+│   │   ├── constants.js           # Configuration constants (API URLs, model info)
 │   │   ├── App.jsx                # Main React component
 │   │   ├── components/            # Reusable UI components
 │   │   └── assets/                # Sample images and static assets
-│   └── package.json
+│   ├── package.json               # Node.js dependencies
+│   └── vite.config.js             # Vite build configuration
 └── README.md
 ```
 
@@ -124,7 +128,111 @@ def get_prediction(input_file: str, model_path: str = MODEL_PATH,
 
 - `POST /classify` - Upload image for classification (multipart/form-data)
 
-## Deploying the application
+## Deployment
+
+### Backend Deployment (Google Cloud Run)
+
+1. **Install Google Cloud CLI**:
+
+```bash
+# On macOS
+brew install google-cloud-sdk
+# Or download from: https://cloud.google.com/sdk/docs/install
+```
+
+2. **Initialize and authenticate**:
+
+```bash
+gcloud init
+gcloud auth login
+```
+
+3. **Create a new project** (or use existing):
+
+```bash
+gcloud projects create your-project-id --name="ML Demo App"
+gcloud config set project your-project-id
+```
+
+4. **Enable required APIs**:
+
+```bash
+gcloud services enable cloudbuild.googleapis.com
+gcloud services enable run.googleapis.com
+```
+
+5. **Deploy from backend directory**:
+
+```bash
+cd backend
+gcloud run deploy ml-demo-backend \
+    --source . \
+    --platform managed \
+    --region us-central1 \
+    --allow-unauthenticated \
+    --memory 2Gi \
+    --cpu 1 \
+    --max-instances 10
+```
+
+Once this completes, you will see the URL of your deployed service.
+Update `API_BASE_URL` in `frontend/src/constants.js` with this URL.
+
+6. **Test your deployed backend**:
+
+```bash
+cd backend
+python test_endpoints.py https://your-service-url.run.app
+```
+
+### Frontend Deployment (Firebase Hosting)
+
+1. **Install Firebase CLI**:
+
+```bash
+npm install -g firebase-tools
+```
+
+2. **Build your React app**:
+
+```bash
+cd frontend
+npm run build
+```
+
+3. **Login and initialize Firebase**:
+
+```bash
+firebase login
+firebase init hosting
+```
+
+- Set public directory to `dist`
+- Configure as single-page app: **Yes**
+- Don't overwrite index.html
+
+4. **Deploy**:
+
+```bash
+firebase deploy
+```
+
+### Updating Deployments
+
+**Backend updates**:
+
+```bash
+cd backend
+gcloud run deploy ml-demo-backend --source .
+```
+
+**Frontend updates**:
+
+```bash
+cd frontend
+npm run build
+firebase deploy
+```
 
 ## Requirements
 

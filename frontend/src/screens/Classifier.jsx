@@ -7,6 +7,7 @@ import {
   CLASSIFIER_MODEL_INFO,
   SAMPLE_IMAGES,
   CAN_USER_UPLOAD_IMAGE,
+  API_BASE_URL,
 } from "../constants";
 import { ModelInfo } from "../components/ModelInfo";
 import { ClassificationResultsPanel } from "../components/Classifier/ClassificationResultsPanel";
@@ -58,8 +59,12 @@ const Classifier = ({ onBack, shouldGoToMainPage }) => {
       const formData = new FormData();
       formData.append("image", blob, filename);
 
+      const apiUrl = import.meta.env.DEV
+        ? "http://localhost:8080"
+        : API_BASE_URL;
+
       const classificationResponse = await axios.post(
-        "http://localhost:8080/classify",
+        `${apiUrl}/classify`,
         formData,
         {
           headers: {

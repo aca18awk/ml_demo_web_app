@@ -3,6 +3,7 @@ Use a trained classifier to classify retinal images.
 """
 import torch as th
 from typing import List
+import os
 
 from classifier.Classifier import Classifier
 from classifier.helpers import dev, format_results, classify_image
@@ -10,8 +11,8 @@ from classifier.helpers import dev, format_results, classify_image
 
 CLASS_NAMES = ["Healthy", "Early Glaucoma", "Advanced Glaucoma"]
 
-MODEL_PATH = "/Users/aleksandrakulbaka/Desktop/phd_code/ML_demo_web_app/backend/classifier/best_acc_model.pt"
-INPUT_FILE = "/Users/aleksandrakulbaka/Desktop/phd_code/ML_demo_web_app/backend/classifier/advanced_glaucoma_1.png"
+MODEL_PATH = os.path.join(os.path.dirname(__file__), "best_acc_model.pt")
+INPUT_FILE = os.path.join(os.path.dirname(__file__), "advanced_glaucoma_1.png")
 IMAGE_SIZE = 64
 
 
